@@ -1,4 +1,3 @@
-----
 # Tiny Transformer From Scratch
 
 A planned beginner-friendly PyTorch project for building a small decoder-only transformer for character-level language modeling.
@@ -152,31 +151,24 @@ Possible early ADRs:
 
 ## Planned Initial Milestones
 
-### Milestone 1
-- repository scaffold
-- config setup
-- tokenizer
-- dataset pipeline
-
-### Milestone 2
-- transformer model
-- masking
-- forward-pass tests
-
-### Milestone 3
-- training loop
-- validation
-- checkpointing
-
-### Milestone 4
-- text generation
-- sampling
-- smoke tests
-
-### Milestone 5
-- documentation
-- ADRs
-- cleanup and polish
+| Milestone | Component | Status |
+|---|---|---|
+| Milestone 1 | Repository scaffold | Done |
+| Milestone 1 | Config setup | Done |
+| Milestone 1 | Tokenizer | Done |
+| Milestone 1 | Dataset pipeline | Pending |
+| Milestone 2 | Transformer model | Pending |
+| Milestone 2 | Masking | Pending |
+| Milestone 2 | Forward-pass tests | Pending |
+| Milestone 3 | Training loop | Pending |
+| Milestone 3 | Validation | Pending |
+| Milestone 3 | Checkpointing | Pending |
+| Milestone 4 | Text generation | Pending |
+| Milestone 4 | Sampling | Pending |
+| Milestone 4 | Smoke tests | Pending |
+| Milestone 5 | Documentation | Pending |
+| Milestone 5 | ADRs | Pending |
+| Milestone 5 | Cleanup and polish | Pending |
 
 ## Definition of Done for v1
 
@@ -202,4 +194,3 @@ Possible follow-up work after v1:
 ## Status
 
 Planned
-----
