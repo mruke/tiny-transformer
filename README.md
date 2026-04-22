@@ -158,10 +158,10 @@ Possible early ADRs:
 | Milestone 1 | Config setup | Done | — |
 | Milestone 1 | Tokenizer | Done | — |
 | Milestone 1 | Dataset pipeline | Done | — |
-| **Milestone 2** | **Overall** | **Pending** | — |
-| Milestone 2 | Transformer model | Pending | — |
-| Milestone 2 | Masking | Pending | — |
-| Milestone 2 | Forward-pass tests | Pending | — |
+| **Milestone 2** | **Overall** | **Complete** | **v0.2.0** |
+| Milestone 2 | Transformer model | Done | — |
+| Milestone 2 | Masking | Done | — |
+| Milestone 2 | Forward-pass tests | Done | — |
 | **Milestone 3** | **Overall** | **Pending** | — |
 | Milestone 3 | Training loop | Pending | — |
 | Milestone 3 | Validation | Pending | — |
