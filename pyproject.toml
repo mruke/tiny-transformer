@@ -8,6 +8,11 @@ version = "0.1.0"
 description = "A small decoder-only transformer built in PyTorch for character-level language modeling."
 readme = "README.md"
 requires-python = ">=3.11"
+dependencies = [
+    "torch",
+    "PyYAML",
+    "pytest",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
