@@ -1,0 +1,41 @@
+project:
+  name: "tiny-transformer"
+  version: "0.1.0-debug"
+  seed: 42
+
+data:
+  dataset_path: "data/input.txt"
+  train_split_ratio: 0.9
+  context_window: 32
+  encoding: "utf-8"
+
+model:
+  vocab_size: null
+  max_sequence_length: 32
+  embedding_dim: 64
+  num_heads: 4
+  num_layers: 1
+  feedforward_dim: 128
+  dropout_rate: 0.1
+
+training:
+  batch_size: 8
+  learning_rate: 0.001
+  weight_decay: 0.0
+  max_epochs: 2
+  device: "cpu"
+  eval_interval: 10
+  log_interval: 5
+
+generation:
+  max_new_tokens: 20
+  temperature: 1.0
+  top_k: null
+
+logging:
+  log_level: "DEBUG"
+
+checkpointing:
+  output_dir: "outputs/checkpoints-debug"
+  save_every_n_epochs: 1
+  checkpoint_name_prefix: "tiny_transformer_debug"
