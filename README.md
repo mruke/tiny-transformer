@@ -151,29 +151,29 @@ Possible early ADRs:
 
 ## Planned Initial Milestones
 
-| Milestone | Component | Status |
-|---|---|---|
-| **Milestone 1** | **Overall milestone status** | **Complete** |
-| Milestone 1 | Repository scaffold | Done |
-| Milestone 1 | Config setup | Done |
-| Milestone 1 | Tokenizer | Done |
-| Milestone 1 | Dataset pipeline | Done |
-| **Milestone 2** | **Overall milestone status** | **Pending** |
-| Milestone 2 | Transformer model | Pending |
-| Milestone 2 | Masking | Pending |
-| Milestone 2 | Forward-pass tests | Pending |
-| **Milestone 3** | **Overall milestone status** | **Pending** |
-| Milestone 3 | Training loop | Pending |
-| Milestone 3 | Validation | Pending |
-| Milestone 3 | Checkpointing | Pending |
-| **Milestone 4** | **Overall milestone status** | **Pending** |
-| Milestone 4 | Text generation | Pending |
-| Milestone 4 | Sampling | Pending |
-| Milestone 4 | Smoke tests | Pending |
-| **Milestone 5** | **Overall milestone status** | **Pending** |
-| Milestone 5 | Documentation | Pending |
-| Milestone 5 | ADRs | Pending |
-| Milestone 5 | Cleanup and polish | Pending |
+| Milestone | Component | Status | Tag |
+|---|---|---|---|
+| **Milestone 1** | **Overall** | **Complete** | **v0.1.0** |
+| Milestone 1 | Repository scaffold | Done | — |
+| Milestone 1 | Config setup | Done | — |
+| Milestone 1 | Tokenizer | Done | — |
+| Milestone 1 | Dataset pipeline | Done | — |
+| **Milestone 2** | **Overall** | **Pending** | — |
+| Milestone 2 | Transformer model | Pending | — |
+| Milestone 2 | Masking | Pending | — |
+| Milestone 2 | Forward-pass tests | Pending | — |
+| **Milestone 3** | **Overall** | **Pending** | — |
+| Milestone 3 | Training loop | Pending | — |
+| Milestone 3 | Validation | Pending | — |
+| Milestone 3 | Checkpointing | Pending | — |
+| **Milestone 4** | **Overall** | **Pending** | — |
+| Milestone 4 | Text generation | Pending | — |
+| Milestone 4 | Sampling | Pending | — |
+| Milestone 4 | Smoke tests | Pending | — |
+| **Milestone 5** | **Overall** | **Pending** | — |
+| Milestone 5 | Documentation | Pending | — |
+| Milestone 5 | ADRs | Pending | — |
+| Milestone 5 | Cleanup and polish | Pending | — |
 
 ## Definition of Done for v1
 
