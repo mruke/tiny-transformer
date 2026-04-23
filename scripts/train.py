@@ -11,6 +11,7 @@ from tiny_transformer.data.dataset import TokenSequenceDataset
 from tiny_transformer.data.splits import split_token_ids
 from tiny_transformer.data.tokenizer import CharacterTokenizer
 from tiny_transformer.model.transformer import DecoderOnlyTransformer
+from tiny_transformer.training.checkpoints import build_checkpoint_path
 from tiny_transformer.training.optimizer import build_optimizer
 from tiny_transformer.training.trainer import Trainer
 
@@ -185,6 +186,35 @@ def _build_model(
 
 
 # ---------------------------------------------------------------------------
+# _should_save_checkpoint
+#
+# This function checks whether the current epoch should save a checkpoint.
+# ---------------------------------------------------------------------------
+def _should_save_checkpoint(
+    current_epoch: int,
+    save_every_n_epochs: int,
+) -> bool:
+    return current_epoch % save_every_n_epochs == 0
+
+
+# ---------------------------------------------------------------------------
+# _build_epoch_checkpoint_path
+#
+# This function builds the checkpoint path for one training epoch from config
+# values.
+# ---------------------------------------------------------------------------
+def _build_epoch_checkpoint_path(
+    config: AppConfig,
+    epoch: int,
+) -> Path:
+    return build_checkpoint_path(
+        output_dir=config.checkpointing.output_dir,
+        checkpoint_prefix=config.checkpointing.checkpoint_name_prefix,
+        epoch=epoch,
+    )
+
+
+# ---------------------------------------------------------------------------
 # run_training
 #
 # This function wires the training and validation components together and runs
@@ -226,9 +256,9 @@ def run_training(config_path: str = "configs/base.yaml") -> None:
     )
 
     for epoch_index in range(config.training.max_epochs):
+        epoch_number = epoch_index + 1
         training_result = trainer.train_epoch(training_dataloader)
         validation_result = trainer.validate_epoch(validation_dataloader)
-        epoch_number = epoch_index + 1
 
         print(
             f"Epoch {epoch_number}/{config.training.max_epochs} "
@@ -237,6 +267,22 @@ def run_training(config_path: str = "configs/base.yaml") -> None:
             f"- train_batches: {training_result.batch_count} "
             f"- val_batches: {validation_result.batch_count}"
         )
+
+        if _should_save_checkpoint(
+            current_epoch=epoch_number,
+            save_every_n_epochs=config.checkpointing.save_every_n_epochs,
+        ):
+            checkpoint_path = _build_epoch_checkpoint_path(
+                config=config,
+                epoch=epoch_number,
+            )
+            trainer.save_checkpoint(
+                config=config,
+                epoch=epoch_number,
+                checkpoint_path=checkpoint_path,
+            )
+
+            print(f"Saved checkpoint: {checkpoint_path}")
 
 
 # ---------------------------------------------------------------------------
