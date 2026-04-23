@@ -162,10 +162,10 @@ Possible early ADRs:
 | Milestone 2 | Transformer model | Done | — |
 | Milestone 2 | Masking | Done | — |
 | Milestone 2 | Forward-pass tests | Done | — |
-| **Milestone 3** | **Overall** | **Pending** | — |
-| Milestone 3 | Training loop | Pending | — |
-| Milestone 3 | Validation | Pending | — |
-| Milestone 3 | Checkpointing | Pending | — |
+| **Milestone 3** | **Overall** | **Complete** | **v0.3.0** |
+| Milestone 3 | Training loop | Done | — |
+| Milestone 3 | Validation | Done | — |
+| Milestone 3 | Checkpointing | Done | — |
 | **Milestone 4** | **Overall** | **Pending** | — |
 | Milestone 4 | Text generation | Pending | — |
 | Milestone 4 | Sampling | Pending | — |
