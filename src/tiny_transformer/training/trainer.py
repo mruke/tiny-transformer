@@ -8,6 +8,7 @@ from torch import nn
 from torch.optim import Optimizer
 
 from tiny_transformer.training.losses import compute_next_token_loss
+from tiny_transformer.training.metrics import LossTracker
 
 
 # ---------------------------------------------------------------------------
@@ -202,4 +203,54 @@ class Trainer:
         return TrainEpochResult(
             average_loss=average_loss,
             batch_count=batch_count,
+        )
+
+    # -----------------------------------------------------------------------
+    # validate_batch
+    #
+    # This method computes loss for one validation batch.
+    # No gradients or optimizer updates are used in validation mode.
+    # -----------------------------------------------------------------------
+    def validate_batch(
+        self,
+        input_ids: torch.Tensor,
+        target_ids: torch.Tensor,
+    ) -> float:
+        prepared_input_ids, prepared_target_ids = self._prepare_batch(
+            input_ids=input_ids,
+            target_ids=target_ids,
+        )
+
+        self._model.eval()
+
+        with torch.no_grad():
+            logits = self._model(prepared_input_ids)
+            loss = compute_next_token_loss(logits, prepared_target_ids)
+
+        return float(loss.item())
+
+    # -----------------------------------------------------------------------
+    # validate_epoch
+    #
+    # This method runs one full pass across all validation batches.
+    # It returns the average loss and batch count for the epoch.
+    # -----------------------------------------------------------------------
+    def validate_epoch(
+        self,
+        batches: Iterable[tuple[torch.Tensor, torch.Tensor]],
+    ) -> TrainEpochResult:
+        loss_tracker = LossTracker()
+
+        for input_ids, target_ids in batches:
+            batch_loss = self.validate_batch(
+                input_ids=input_ids,
+                target_ids=target_ids,
+            )
+            loss_tracker.update(batch_loss)
+
+        _validate_batch_count(loss_tracker.batch_count)
+
+        return TrainEpochResult(
+            average_loss=loss_tracker.average_loss(),
+            batch_count=loss_tracker.batch_count,
         )

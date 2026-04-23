@@ -59,13 +59,14 @@ def _resolve_vocab_size(
 
 
 # ---------------------------------------------------------------------------
-# _build_training_dataset
+# _prepare_corpus
 #
-# This function creates the training dataset from raw text and config values.
+# This function reads the corpus, builds the tokenizer, encodes the text,
+# and splits token IDs into training and validation token lists.
 # ---------------------------------------------------------------------------
-def _build_training_dataset(
+def _prepare_corpus(
     config: AppConfig,
-) -> tuple[TokenSequenceDataset, CharacterTokenizer]:
+) -> tuple[list[int], list[int], CharacterTokenizer]:
     text = _read_text(
         dataset_path=config.data.dataset_path,
         encoding=config.data.encoding,
@@ -73,17 +74,42 @@ def _build_training_dataset(
     tokenizer = _build_tokenizer(text)
     token_ids = tokenizer.encode(text)
 
-    train_token_ids, _ = split_token_ids(
+    train_token_ids, validation_token_ids = split_token_ids(
         token_ids=token_ids,
         train_split_ratio=config.data.train_split_ratio,
     )
 
-    dataset = TokenSequenceDataset(
+    return train_token_ids, validation_token_ids, tokenizer
+
+
+# ---------------------------------------------------------------------------
+# _build_training_dataset
+#
+# This function creates the training dataset from prepared token IDs.
+# ---------------------------------------------------------------------------
+def _build_training_dataset(
+    config: AppConfig,
+    train_token_ids: list[int],
+) -> TokenSequenceDataset:
+    return TokenSequenceDataset(
         token_ids=train_token_ids,
         context_window=config.data.context_window,
     )
 
-    return dataset, tokenizer
+
+# ---------------------------------------------------------------------------
+# _build_validation_dataset
+#
+# This function creates the validation dataset from prepared token IDs.
+# ---------------------------------------------------------------------------
+def _build_validation_dataset(
+    config: AppConfig,
+    validation_token_ids: list[int],
+) -> TokenSequenceDataset:
+    return TokenSequenceDataset(
+        token_ids=validation_token_ids,
+        context_window=config.data.context_window,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -111,12 +137,29 @@ def _collate_token_batches(
 # ---------------------------------------------------------------------------
 def _build_training_dataloader(
     config: AppConfig,
-    dataset: TokenSequenceDataset,
+    training_dataset: TokenSequenceDataset,
 ) -> DataLoader:
     return DataLoader(
-        dataset,
+        training_dataset,
         batch_size=config.training.batch_size,
         shuffle=True,
+        collate_fn=_collate_token_batches,
+    )
+
+
+# ---------------------------------------------------------------------------
+# _build_validation_dataloader
+#
+# This function wraps the validation dataset in a dataloader.
+# ---------------------------------------------------------------------------
+def _build_validation_dataloader(
+    config: AppConfig,
+    validation_dataset: TokenSequenceDataset,
+) -> DataLoader:
+    return DataLoader(
+        validation_dataset,
+        batch_size=config.training.batch_size,
+        shuffle=False,
         collate_fn=_collate_token_batches,
     )
 
@@ -144,16 +187,38 @@ def _build_model(
 # ---------------------------------------------------------------------------
 # run_training
 #
-# This function wires the training components together and runs the configured
-# number of training epochs.
+# This function wires the training and validation components together and runs
+# the configured number of epochs.
 # ---------------------------------------------------------------------------
 def run_training(config_path: str = "configs/base.yaml") -> None:
     config = load_config(config_path)
-    dataset, tokenizer = _build_training_dataset(config)
-    dataloader = _build_training_dataloader(config, dataset)
+
+    train_token_ids, validation_token_ids, tokenizer = _prepare_corpus(config)
+
+    training_dataset = _build_training_dataset(
+        config=config,
+        train_token_ids=train_token_ids,
+    )
+    validation_dataset = _build_validation_dataset(
+        config=config,
+        validation_token_ids=validation_token_ids,
+    )
+
+    training_dataloader = _build_training_dataloader(
+        config=config,
+        training_dataset=training_dataset,
+    )
+    validation_dataloader = _build_validation_dataloader(
+        config=config,
+        validation_dataset=validation_dataset,
+    )
+
     vocab_size = _resolve_vocab_size(config, tokenizer)
-    model = _build_model(config, vocab_size)
-    optimizer = build_optimizer(model, config)
+    model = _build_model(
+        config=config,
+        vocab_size=vocab_size,
+    )
+    optimizer = build_optimizer(model=model, config=config)
     trainer = Trainer(
         model=model,
         optimizer=optimizer,
@@ -161,13 +226,16 @@ def run_training(config_path: str = "configs/base.yaml") -> None:
     )
 
     for epoch_index in range(config.training.max_epochs):
-        epoch_result = trainer.train_epoch(dataloader)
+        training_result = trainer.train_epoch(training_dataloader)
+        validation_result = trainer.validate_epoch(validation_dataloader)
         epoch_number = epoch_index + 1
 
         print(
             f"Epoch {epoch_number}/{config.training.max_epochs} "
-            f"- average_loss: {epoch_result.average_loss:.4f} "
-            f"- batch_count: {epoch_result.batch_count}"
+            f"- train_loss: {training_result.average_loss:.4f} "
+            f"- val_loss: {validation_result.average_loss:.4f} "
+            f"- train_batches: {training_result.batch_count} "
+            f"- val_batches: {validation_result.batch_count}"
         )
 
 
