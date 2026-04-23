@@ -1,12 +1,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Iterable
 
 import torch
 from torch import nn
 from torch.optim import Optimizer
 
+from tiny_transformer.config import AppConfig
+from tiny_transformer.training.checkpoints import (
+    CheckpointMetadata,
+    load_checkpoint,
+    save_checkpoint,
+)
 from tiny_transformer.training.losses import compute_next_token_loss
 from tiny_transformer.training.metrics import LossTracker
 
@@ -253,4 +260,42 @@ class Trainer:
         return TrainEpochResult(
             average_loss=loss_tracker.average_loss(),
             batch_count=loss_tracker.batch_count,
+        )
+
+    # -----------------------------------------------------------------------
+    # save_checkpoint
+    #
+    # This method saves the current trainer model and optimizer state to one
+    # checkpoint file and returns the saved path.
+    # -----------------------------------------------------------------------
+    def save_checkpoint(
+        self,
+        config: AppConfig,
+        epoch: int,
+        checkpoint_path: str | Path,
+    ) -> Path:
+        return save_checkpoint(
+            model=self._model,
+            optimizer=self._optimizer,
+            config=config,
+            epoch=epoch,
+            checkpoint_path=checkpoint_path,
+        )
+
+    # -----------------------------------------------------------------------
+    # load_checkpoint
+    #
+    # This method loads model and optimizer state from one checkpoint file
+    # into the current trainer. It returns the loaded checkpoint metadata.
+    # -----------------------------------------------------------------------
+    def load_checkpoint(
+        self,
+        checkpoint_path: str | Path,
+        map_location: str | torch.device = "cpu",
+    ) -> CheckpointMetadata:
+        return load_checkpoint(
+            model=self._model,
+            optimizer=self._optimizer,
+            checkpoint_path=checkpoint_path,
+            map_location=map_location,
         )

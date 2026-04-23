@@ -22,6 +22,7 @@ from tiny_transformer.training.checkpoints import (
     save_checkpoint,
 )
 from tiny_transformer.training.optimizer import build_optimizer
+from tiny_transformer.training.trainer import Trainer
 
 
 # ---------------------------------------------------------------------------
@@ -83,6 +84,22 @@ def _build_test_config() -> AppConfig:
 # ---------------------------------------------------------------------------
 def _build_test_model() -> torch.nn.Module:
     return torch.nn.Linear(8, 4)
+
+
+# ---------------------------------------------------------------------------
+# _build_test_trainer
+#
+# This helper creates a trainer for checkpoint integration tests.
+# ---------------------------------------------------------------------------
+def _build_test_trainer(config: AppConfig) -> Trainer:
+    model = _build_test_model()
+    optimizer = build_optimizer(model, config)
+
+    return Trainer(
+        model=model,
+        optimizer=optimizer,
+        device=config.training.device,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -237,3 +254,51 @@ def test_save_checkpoint_rejects_non_positive_epoch(tmp_path: Path) -> None:
             epoch=0,
             checkpoint_path=checkpoint_path,
         )
+
+
+# ---------------------------------------------------------------------------
+# test_trainer_save_checkpoint_creates_checkpoint_file
+#
+# This test checks that the trainer can save its current state through the
+# checkpoint module.
+# ---------------------------------------------------------------------------
+def test_trainer_save_checkpoint_creates_checkpoint_file(tmp_path: Path) -> None:
+    config = _build_test_config()
+    trainer = _build_test_trainer(config)
+    checkpoint_path = tmp_path / "trainer_checkpoint.pt"
+
+    saved_path = trainer.save_checkpoint(
+        config=config,
+        epoch=1,
+        checkpoint_path=checkpoint_path,
+    )
+
+    assert saved_path == checkpoint_path
+    assert checkpoint_path.exists()
+
+
+# ---------------------------------------------------------------------------
+# test_trainer_load_checkpoint_restores_saved_metadata
+#
+# This test checks that the trainer can load checkpoint state and receive the
+# saved metadata.
+# ---------------------------------------------------------------------------
+def test_trainer_load_checkpoint_restores_saved_metadata(tmp_path: Path) -> None:
+    config = _build_test_config()
+    trainer = _build_test_trainer(config)
+    checkpoint_path = tmp_path / "trainer_checkpoint.pt"
+
+    trainer.save_checkpoint(
+        config=config,
+        epoch=2,
+        checkpoint_path=checkpoint_path,
+    )
+
+    loaded_metadata = trainer.load_checkpoint(
+        checkpoint_path=checkpoint_path,
+    )
+
+    assert isinstance(loaded_metadata, CheckpointMetadata)
+    assert loaded_metadata.epoch == 2
+    assert loaded_metadata.project_name == "tiny-transformer"
+    assert loaded_metadata.project_version == "0.1.0-test"
