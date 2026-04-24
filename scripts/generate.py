@@ -7,11 +7,14 @@ import torch
 
 from tiny_transformer.config import AppConfig, load_config
 from tiny_transformer.data.tokenizer import CharacterTokenizer
+from tiny_transformer.inference.generator import (
+    generate_next_tokens,
+    generate_next_tokens_greedy,
+)
 from tiny_transformer.model.transformer import DecoderOnlyTransformer
 from tiny_transformer.training.checkpoints import build_checkpoint_path
 from tiny_transformer.training.optimizer import build_optimizer
 from tiny_transformer.training.trainer import Trainer
-from tiny_transformer.inference.generator import generate_next_tokens_greedy
 
 
 # ---------------------------------------------------------------------------
@@ -36,7 +39,29 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--checkpoint",
         default=None,
-        help="Optional path to a checkpoint file. If omitted, the script uses the checkpoint for the final configured epoch.",
+        help=(
+            "Optional path to a checkpoint file. "
+            "If omitted, the script uses the checkpoint for the final "
+            "configured epoch."
+        ),
+    )
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=None,
+        help=(
+            "Optional temperature for stochastic generation. "
+            "If omitted, greedy generation is used."
+        ),
+    )
+    parser.add_argument(
+        "--top-k",
+        type=int,
+        default=None,
+        help=(
+            "Optional top-k restriction used with temperature sampling. "
+            "Ignored during greedy generation."
+        ),
     )
 
     return parser.parse_args()
@@ -160,6 +185,35 @@ def _decode_generated_output(
 
 
 # ---------------------------------------------------------------------------
+# _generate_output_token_ids
+#
+# This function selects the configured generation mode and returns generated
+# token IDs.
+# ---------------------------------------------------------------------------
+def _generate_output_token_ids(
+    model: DecoderOnlyTransformer,
+    prompt_token_ids: torch.Tensor,
+    config: AppConfig,
+    temperature: float | None,
+    top_k: int | None,
+) -> torch.Tensor:
+    if temperature is None:
+        return generate_next_tokens_greedy(
+            model=model,
+            prompt_token_ids=prompt_token_ids,
+            max_new_tokens=config.generation.max_new_tokens,
+        )
+
+    return generate_next_tokens(
+        model=model,
+        prompt_token_ids=prompt_token_ids,
+        max_new_tokens=config.generation.max_new_tokens,
+        temperature=temperature,
+        top_k=top_k,
+    )
+
+
+# ---------------------------------------------------------------------------
 # run_generation
 #
 # This function wires the generation components together and prints generated
@@ -169,6 +223,8 @@ def run_generation(
     config_path: str,
     prompt: str,
     checkpoint_path: str | None = None,
+    temperature: float | None = None,
+    top_k: int | None = None,
 ) -> None:
     config = load_config(config_path)
     corpus_text = _read_text(
@@ -196,10 +252,12 @@ def run_generation(
         prompt=prompt,
         device=config.training.device,
     )
-    generated_token_ids = generate_next_tokens_greedy(
+    generated_token_ids = _generate_output_token_ids(
         model=model,
         prompt_token_ids=prompt_token_ids,
-        max_new_tokens=config.generation.max_new_tokens,
+        config=config,
+        temperature=temperature,
+        top_k=top_k,
     )
     generated_text = _decode_generated_output(
         tokenizer=tokenizer,
@@ -221,6 +279,8 @@ def main() -> None:
         config_path=args.config,
         prompt=args.prompt,
         checkpoint_path=args.checkpoint,
+        temperature=args.temperature,
+        top_k=args.top_k,
     )
 
 
