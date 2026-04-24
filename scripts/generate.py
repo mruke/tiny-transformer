@@ -51,7 +51,7 @@ def _parse_args() -> argparse.Namespace:
         default=None,
         help=(
             "Optional temperature for stochastic generation. "
-            "If omitted, greedy generation is used."
+            "If omitted, greedy generation is used unless --top-k is set."
         ),
     )
     parser.add_argument(
@@ -60,7 +60,7 @@ def _parse_args() -> argparse.Namespace:
         default=None,
         help=(
             "Optional top-k restriction used with temperature sampling. "
-            "Ignored during greedy generation."
+            "If set without --temperature, the config temperature is used."
         ),
     )
 
@@ -185,6 +185,29 @@ def _decode_generated_output(
 
 
 # ---------------------------------------------------------------------------
+# _resolve_generation_settings
+#
+# This function resolves the effective generation mode settings.
+# Greedy generation is used when both temperature and top_k are omitted.
+# If top_k is provided without temperature, the config temperature is used.
+# ---------------------------------------------------------------------------
+def _resolve_generation_settings(
+    config: AppConfig,
+    temperature: float | None,
+    top_k: int | None,
+) -> tuple[float | None, int | None]:
+    if temperature is None and top_k is None:
+        return None, None
+
+    resolved_temperature = temperature
+
+    if resolved_temperature is None:
+        resolved_temperature = config.generation.temperature
+
+    return resolved_temperature, top_k
+
+
+# ---------------------------------------------------------------------------
 # _generate_output_token_ids
 #
 # This function selects the configured generation mode and returns generated
@@ -197,7 +220,13 @@ def _generate_output_token_ids(
     temperature: float | None,
     top_k: int | None,
 ) -> torch.Tensor:
-    if temperature is None:
+    resolved_temperature, resolved_top_k = _resolve_generation_settings(
+        config=config,
+        temperature=temperature,
+        top_k=top_k,
+    )
+
+    if resolved_temperature is None:
         return generate_next_tokens_greedy(
             model=model,
             prompt_token_ids=prompt_token_ids,
@@ -208,8 +237,8 @@ def _generate_output_token_ids(
         model=model,
         prompt_token_ids=prompt_token_ids,
         max_new_tokens=config.generation.max_new_tokens,
-        temperature=temperature,
-        top_k=top_k,
+        temperature=resolved_temperature,
+        top_k=resolved_top_k,
     )
 
 
@@ -264,6 +293,7 @@ def run_generation(
         generated_token_ids=generated_token_ids,
     )
 
+    print(f"Checkpoint: {resolved_checkpoint_path}")
     print(generated_text)
 
 
