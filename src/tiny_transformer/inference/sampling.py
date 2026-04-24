@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import torch
+from torch.nn import functional
 
 
 # ---------------------------------------------------------------------------
@@ -21,6 +22,33 @@ def _validate_logits(logits: torch.Tensor) -> None:
 
 
 # ---------------------------------------------------------------------------
+# _validate_temperature
+#
+# This function checks that temperature is a positive real number.
+# ---------------------------------------------------------------------------
+def _validate_temperature(temperature: float) -> None:
+    if not isinstance(temperature, (int, float)):
+        raise TypeError("temperature must be a real number.")
+
+    if temperature <= 0:
+        raise ValueError("temperature must be greater than zero.")
+
+
+# ---------------------------------------------------------------------------
+# _scale_logits_by_temperature
+#
+# This function scales logits by temperature before sampling.
+# Lower temperatures make the distribution sharper.
+# Higher temperatures make the distribution flatter.
+# ---------------------------------------------------------------------------
+def _scale_logits_by_temperature(
+    logits: torch.Tensor,
+    temperature: float,
+) -> torch.Tensor:
+    return logits / float(temperature)
+
+
+# ---------------------------------------------------------------------------
 # greedy_sample_next_token
 #
 # This function selects the highest-logit token from each batch row.
@@ -30,3 +58,26 @@ def greedy_sample_next_token(logits: torch.Tensor) -> torch.Tensor:
     _validate_logits(logits)
 
     return torch.argmax(logits, dim=1)
+
+
+# ---------------------------------------------------------------------------
+# temperature_sample_next_token
+#
+# This function samples one token from each batch row after scaling logits by
+# temperature and converting them to probabilities.
+# ---------------------------------------------------------------------------
+def temperature_sample_next_token(
+    logits: torch.Tensor,
+    temperature: float,
+) -> torch.Tensor:
+    _validate_logits(logits)
+    _validate_temperature(temperature)
+
+    scaled_logits = _scale_logits_by_temperature(
+        logits=logits,
+        temperature=temperature,
+    )
+    probabilities = functional.softmax(scaled_logits, dim=1)
+    sampled_token_ids = torch.multinomial(probabilities, num_samples=1)
+
+    return sampled_token_ids.squeeze(1)
