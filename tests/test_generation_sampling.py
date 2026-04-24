@@ -212,3 +212,99 @@ def test_temperature_sample_next_token_preserves_device() -> None:
     )
 
     assert next_token_ids.device == logits.device
+
+
+# ---------------------------------------------------------------------------
+# test_temperature_sample_next_token_rejects_non_integer_top_k
+#
+# This test checks that top_k must be an integer or None.
+# ---------------------------------------------------------------------------
+def test_temperature_sample_next_token_rejects_non_integer_top_k() -> None:
+    logits = torch.randn(2, 5)
+
+    with pytest.raises(TypeError, match="top_k must be an integer or None"):
+        temperature_sample_next_token(
+            logits=logits,
+            temperature=1.0,
+            top_k=2.5,  # type: ignore[arg-type]
+        )
+
+
+# ---------------------------------------------------------------------------
+# test_temperature_sample_next_token_rejects_non_positive_top_k
+#
+# This test checks that top_k must be greater than zero.
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("top_k", [0, -1])
+def test_temperature_sample_next_token_rejects_non_positive_top_k(
+    top_k: int,
+) -> None:
+    logits = torch.randn(2, 5)
+
+    with pytest.raises(ValueError, match="top_k must be greater than zero"):
+        temperature_sample_next_token(
+            logits=logits,
+            temperature=1.0,
+            top_k=top_k,
+        )
+
+
+# ---------------------------------------------------------------------------
+# test_temperature_sample_next_token_rejects_top_k_above_vocab_size
+#
+# This test checks that top_k must not exceed vocab size.
+# ---------------------------------------------------------------------------
+def test_temperature_sample_next_token_rejects_top_k_above_vocab_size() -> None:
+    logits = torch.randn(2, 5)
+
+    with pytest.raises(ValueError, match="top_k must not exceed vocab_size"):
+        temperature_sample_next_token(
+            logits=logits,
+            temperature=1.0,
+            top_k=6,
+        )
+
+
+# ---------------------------------------------------------------------------
+# test_temperature_sample_next_token_with_top_k_one_matches_greedy_choice
+#
+# This test checks that top_k=1 limits sampling to the single highest-logit
+# token in each batch row.
+# ---------------------------------------------------------------------------
+def test_temperature_sample_next_token_with_top_k_one_matches_greedy_choice() -> None:
+    torch.manual_seed(0)
+    logits = torch.tensor(
+        [
+            [0.1, 0.8, 0.2],
+            [1.2, 0.4, 0.3],
+            [0.0, 0.2, 2.5],
+        ]
+    )
+
+    sampled_token_ids = temperature_sample_next_token(
+        logits=logits,
+        temperature=1.0,
+        top_k=1,
+    )
+    greedy_token_ids = greedy_sample_next_token(logits)
+
+    assert torch.equal(sampled_token_ids, greedy_token_ids)
+
+
+# ---------------------------------------------------------------------------
+# test_temperature_sample_next_token_with_top_k_limits_possible_choices
+#
+# This test checks that top_k filtering prevents sampling from tokens outside
+# the allowed top-k set.
+# ---------------------------------------------------------------------------
+def test_temperature_sample_next_token_with_top_k_limits_possible_choices() -> None:
+    torch.manual_seed(0)
+    logits = torch.tensor([[10.0, 9.0, -10.0, -10.0]])
+
+    sampled_token_ids = temperature_sample_next_token(
+        logits=logits,
+        temperature=1.0,
+        top_k=2,
+    )
+
+    assert sampled_token_ids.item() in {0, 1}
