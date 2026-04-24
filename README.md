@@ -166,10 +166,10 @@ Possible early ADRs:
 | Milestone 3 | Training loop | Done | — |
 | Milestone 3 | Validation | Done | — |
 | Milestone 3 | Checkpointing | Done | — |
-| **Milestone 4** | **Overall** | **Pending** | — |
-| Milestone 4 | Text generation | Pending | — |
-| Milestone 4 | Sampling | Pending | — |
-| Milestone 4 | Smoke tests | Pending | — |
+| **Milestone 4** | **Overall** | **Complete** | **v0.4.0** |
+| Milestone 4 | Text generation | Pending | Done |
+| Milestone 4 | Sampling | Pending | Done |
+| Milestone 4 | Smoke tests | Pending | Done |
 | **Milestone 5** | **Overall** | **Pending** | — |
 | Milestone 5 | Documentation | Pending | — |
 | Milestone 5 | ADRs | Pending | — |
