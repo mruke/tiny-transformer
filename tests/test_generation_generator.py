@@ -87,6 +87,61 @@ class _TemperatureTestModel(nn.Module):
 
 
 # ---------------------------------------------------------------------------
+# _ContextWindowTrackingModel
+#
+# This test model records the sequence lengths it receives so context-window
+# trimming can be verified.
+# ---------------------------------------------------------------------------
+class _ContextWindowTrackingModel(nn.Module):
+    # -----------------------------------------------------------------------
+    # _ContextWindowTrackingModel.__init__
+    #
+    # This method stores vocab size, next-token choice, and max sequence
+    # length.
+    # -----------------------------------------------------------------------
+    def __init__(
+        self,
+        vocab_size: int,
+        next_token_id: int,
+        max_sequence_length: int,
+    ) -> None:
+        super().__init__()
+        self._vocab_size = vocab_size
+        self._next_token_id = next_token_id
+        self._max_sequence_length = max_sequence_length
+        self.seen_sequence_lengths: list[int] = []
+
+    # -----------------------------------------------------------------------
+    # max_sequence_length
+    #
+    # This property returns the configured maximum supported sequence length.
+    # -----------------------------------------------------------------------
+    @property
+    def max_sequence_length(self) -> int:
+        return self._max_sequence_length
+
+    # -----------------------------------------------------------------------
+    # _ContextWindowTrackingModel.forward
+    #
+    # This method records seen sequence lengths and returns fixed logits.
+    # -----------------------------------------------------------------------
+    def forward(self, input_ids: torch.Tensor) -> torch.Tensor:
+        batch_size, sequence_length = input_ids.shape
+        self.seen_sequence_lengths.append(sequence_length)
+
+        logits = torch.zeros(
+            batch_size,
+            sequence_length,
+            self._vocab_size,
+            dtype=torch.float32,
+            device=input_ids.device,
+        )
+        logits[:, :, self._next_token_id] = 1.0
+
+        return logits
+
+
+# ---------------------------------------------------------------------------
 # greedy generation tests
 # ---------------------------------------------------------------------------
 
@@ -171,6 +226,30 @@ def test_generate_next_tokens_greedy_supports_batch_generation() -> None:
 
     assert generated_token_ids.shape == (2, 5)
     assert torch.equal(generated_token_ids[:, -2:], torch.tensor([[5, 5], [5, 5]]))
+
+
+# ---------------------------------------------------------------------------
+# test_generate_next_tokens_greedy_trims_context_to_model_window
+#
+# This test checks that generation trims the running context to the model's
+# max sequence length before each forward pass.
+# ---------------------------------------------------------------------------
+def test_generate_next_tokens_greedy_trims_context_to_model_window() -> None:
+    model = _ContextWindowTrackingModel(
+        vocab_size=8,
+        next_token_id=3,
+        max_sequence_length=3,
+    )
+    prompt_token_ids = torch.tensor([[1, 2, 4]], dtype=torch.long)
+
+    generated_token_ids = generate_next_tokens_greedy(
+        model=model,
+        prompt_token_ids=prompt_token_ids,
+        max_new_tokens=2,
+    )
+
+    assert generated_token_ids.shape == (1, 5)
+    assert model.seen_sequence_lengths == [3, 3]
 
 
 # ---------------------------------------------------------------------------
@@ -319,4 +398,29 @@ def test_generate_next_tokens_rejects_non_positive_top_k(top_k: int) -> None:
             max_new_tokens=2,
             temperature=1.0,
             top_k=top_k,
+        )
+
+
+# ---------------------------------------------------------------------------
+# general validation tests
+# ---------------------------------------------------------------------------
+
+
+# ---------------------------------------------------------------------------
+# test_generate_next_tokens_greedy_rejects_empty_prompt_batch
+#
+# This test checks that prompt token IDs must include at least one batch row.
+# ---------------------------------------------------------------------------
+def test_generate_next_tokens_greedy_rejects_empty_prompt_batch() -> None:
+    model = _GreedyTestModel(vocab_size=8, next_token_id=3)
+    prompt_token_ids = torch.empty((0, 3), dtype=torch.long)
+
+    with pytest.raises(
+        ValueError,
+        match="prompt_token_ids must include at least one batch row",
+    ):
+        generate_next_tokens_greedy(
+            model=model,
+            prompt_token_ids=prompt_token_ids,
+            max_new_tokens=2,
         )

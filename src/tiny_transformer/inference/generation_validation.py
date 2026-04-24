@@ -32,6 +32,9 @@ def validate_prompt_token_ids(prompt_token_ids: torch.Tensor) -> None:
     if prompt_token_ids.dtype != torch.long:
         raise TypeError("prompt_token_ids must use torch.long dtype.")
 
+    if prompt_token_ids.shape[0] <= 0:
+        raise ValueError("prompt_token_ids must include at least one batch row.")
+
     if prompt_token_ids.shape[1] <= 0:
         raise ValueError("prompt_token_ids must include at least one token.")
 

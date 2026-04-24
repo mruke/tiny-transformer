@@ -39,6 +39,68 @@ def _extract_next_token_logits(logits: torch.Tensor) -> torch.Tensor:
 
 
 # ---------------------------------------------------------------------------
+# _resolve_model_device
+#
+# This function returns the model device when parameters or buffers exist.
+# Otherwise, it falls back to the prompt tensor device.
+# ---------------------------------------------------------------------------
+def _resolve_model_device(
+    model: nn.Module,
+    prompt_token_ids: torch.Tensor,
+) -> torch.device:
+    first_parameter = next(model.parameters(), None)
+
+    if first_parameter is not None:
+        return first_parameter.device
+
+    first_buffer = next(model.buffers(), None)
+
+    if first_buffer is not None:
+        return first_buffer.device
+
+    return prompt_token_ids.device
+
+
+# ---------------------------------------------------------------------------
+# _resolve_model_context_window
+#
+# This function returns the model max sequence length when the model exposes
+# a valid max_sequence_length property. Otherwise, it returns None.
+# ---------------------------------------------------------------------------
+def _resolve_model_context_window(model: nn.Module) -> int | None:
+    max_sequence_length = getattr(model, "max_sequence_length", None)
+
+    if max_sequence_length is None:
+        return None
+
+    if not isinstance(max_sequence_length, int) or max_sequence_length <= 0:
+        raise ValueError("model max_sequence_length must be a positive integer.")
+
+    return max_sequence_length
+
+
+# ---------------------------------------------------------------------------
+# _trim_generation_context
+#
+# This function trims generated token IDs to the model context window when one
+# is available.
+# ---------------------------------------------------------------------------
+def _trim_generation_context(
+    generated_token_ids: torch.Tensor,
+    context_window: int | None,
+) -> torch.Tensor:
+    if context_window is None:
+        return generated_token_ids
+
+    _, sequence_length = generated_token_ids.shape
+
+    if sequence_length <= context_window:
+        return generated_token_ids
+
+    return generated_token_ids[:, -context_window:]
+
+
+# ---------------------------------------------------------------------------
 # _run_generation_loop
 #
 # This function runs the shared autoregressive token generation loop.
@@ -51,13 +113,19 @@ def _run_generation_loop(
     max_new_tokens: int,
     sampler: callable,
 ) -> torch.Tensor:
-    generated_token_ids = prompt_token_ids.clone()
+    model_device = _resolve_model_device(model, prompt_token_ids)
+    context_window = _resolve_model_context_window(model)
+    generated_token_ids = prompt_token_ids.to(model_device).clone()
 
     model.eval()
 
     with torch.no_grad():
         for _ in range(max_new_tokens):
-            logits = model(generated_token_ids)
+            model_input_ids = _trim_generation_context(
+                generated_token_ids=generated_token_ids,
+                context_window=context_window,
+            )
+            logits = model(model_input_ids)
             next_token_logits = _extract_next_token_logits(logits)
             next_token_ids = sampler(next_token_logits).unsqueeze(1)
 
