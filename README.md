@@ -1,6 +1,6 @@
 # Tiny Transformer From Scratch
 
-A planned beginner-friendly PyTorch project for building a small decoder-only transformer for character-level language modeling.
+A small PyTorch project for building a decoder-only transformer from scratch for character-level language modeling.
 
 The goal of this project is to learn how transformer-based text generation works by implementing the core parts step by step in a codebase that stays small, readable, and organized.
 
@@ -12,7 +12,7 @@ Transformers are a type of neural network architecture used for sequence modelin
 
 In this project, the model works at the **character level**, meaning each character is treated as a token. That keeps the tokenizer and data pipeline simple, which makes it easier to focus on the core mechanics of the model itself.
 
-The project is intended to cover the main parts of a small language model, including:
+The project covers the main parts of a small language model, including:
 
 - tokenization
 - embeddings
@@ -20,8 +20,9 @@ The project is intended to cover the main parts of a small language model, inclu
 - feedforward layers
 - residual connections and layer normalization
 - training and validation
-- autoregressive text generation
 - checkpointing
+- autoregressive text generation
+- sampling strategies
 - basic testing
 
 ## Purpose
@@ -46,7 +47,7 @@ The first version of this project is meant to:
 
 ## Scope
 
-Planned features for the initial version:
+Implemented features for the initial version:
 
 - character-level tokenization
 - token and positional embeddings
@@ -54,10 +55,13 @@ Planned features for the initial version:
 - feedforward blocks
 - residual connections and layer normalization
 - training loop with validation
-- autoregressive text generation
 - checkpoint save/load
+- autoregressive text generation
+- greedy sampling
+- temperature sampling
+- top-k filtering
 - configuration-driven hyperparameters
-- basic tests
+- focused tests
 
 This first version is intentionally limited so the project stays understandable and realistic to complete.
 
@@ -76,7 +80,7 @@ These are possible future directions, but they are outside the scope of the firs
 
 ## Why Build It This Way
 
-This project is planned as a learning exercise, so the design choices are meant to reduce complexity where possible.
+This project is built as a learning exercise, so the design choices are meant to reduce complexity where possible.
 
 A few examples:
 
@@ -85,71 +89,53 @@ A few examples:
 - **small repository structure** helps avoid one large script that becomes hard to maintain
 - **configuration-driven settings** make it easier to experiment without scattering constants through the code
 
-The structure described here is a plan, not a claim that every implementation detail is already known. Some parts will likely change during development. The purpose of planning the project this way is to give the work a clear direction and keep it manageable while learning.
+The project keeps the implementation small while still separating the major responsibilities of a transformer language modeling workflow.
 
-## Planned Repository Structure
+## Repository Structure
 
-```text
-tiny-transformer/
-├── README.md
-├── ARCHITECTURE.md
-├── configs/
-├── data/
-├── docs/
-│   └── adr/
-├── src/
-│   └── tiny_transformer/
-│       ├── data/
-│       ├── model/
-│       ├── training/
-│       ├── inference/
-│       └── utils/
-├── scripts/
-└── tests/
-```
+    tiny-transformer/
+    ├── README.md
+    ├── ARCHITECTURE.md
+    ├── pyproject.toml
+    ├── configs/
+    │   ├── base.yaml
+    │   └── debug.yaml
+    ├── data/
+    ├── docs/
+    │   └── adr/
+    ├── scripts/
+    │   ├── train.py
+    │   └── generate.py
+    ├── src/
+    │   └── tiny_transformer/
+    │       ├── config/
+    │       ├── data/
+    │       ├── model/
+    │       ├── training/
+    │       ├── inference/
+    │       └── utils/
+    └── tests/
 
-This layout is meant to separate concerns early and make the code easier to navigate. It may change as the project develops.
+This layout separates configuration, data handling, model code, training, inference, scripts, and tests.
 
-## Planned Architecture
+## Architecture
 
-The codebase will be organized into a few main areas:
+The codebase is organized around separate packages for configuration, data handling, model implementation, training, inference, scripts, and tests.
 
-- **data**: dataset loading, splitting, tokenization
-- **model**: embeddings, attention, feedforward layers, transformer blocks
-- **training**: loss, optimization, checkpoints, training loop
-- **inference**: prompt handling and text generation
-- **utils/config**: shared helpers and configuration
-
-The goal is to keep modules focused and avoid tightly coupling everything into one file.
+For a more detailed architecture overview, including module responsibilities, runtime flows, diagrams, and design tradeoffs, see [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## Engineering Principles
 
-This project is being built with a few simple principles in mind:
+The project favors readable, testable, modular code over clever abstractions or production-scale infrastructure.
 
-- no hidden magic numbers
-- clear module boundaries
-- minimal duplication
-- configuration over scattered constants
-- readable and testable code
-- simple design before clever design
+## Documentation
 
-These are goals for how the project should evolve, not a claim that the first version will be perfect.
+Additional project documentation includes:
 
-## Planned Documentation
+- [`ARCHITECTURE.md`](ARCHITECTURE.md) for the technical structure, runtime flows, and design tradeoffs
+- `docs/adr/` for architecture decision records
 
-The repository is expected to include:
-
-- `README.md` for the project overview and usage
-- `ARCHITECTURE.md` for the technical structure
-- a small set of ADRs for key design decisions
-
-Possible early ADRs:
-
-- use character-level tokenization for v1
-- use a decoder-only architecture
-- separate training and generation paths
-
-## Planned Initial Milestones
+## Milestones
 
 | Milestone | Component | Status | Tag |
 |---|---|---|---|
@@ -198,4 +184,4 @@ Possible follow-up work after v1:
 
 ## Status
 
-Planned
+Prototype complete. Final documentation and polish milestone in progress.
