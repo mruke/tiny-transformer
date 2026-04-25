@@ -357,7 +357,63 @@ These are acceptable for the project scope. The repository is intended to demons
 
 ---
 
-## 12. Summary
+## 12. Glossary
+
+This glossary explains common terms used in the project and architecture documentation.
+
+| Term | Meaning |
+|---|---|
+| Autoregressive generation | A generation process where the model predicts one token at a time and then uses that new token as part of the next input. |
+| Batch | A group of training examples processed together in one model step. |
+| Causal mask | A mask that prevents a token from attending to future tokens. This keeps generation left-to-right. |
+| Character-level tokenization | A tokenization approach where each unique character is treated as a token. |
+| Checkpoint | A saved model state that can be loaded later for training continuation or generation. |
+| Config | A settings file or object that controls project behavior, such as model size, training settings, and generation settings. |
+| Context window | The number of previous tokens the model can look at when predicting the next token. |
+| Corpus | The source text used to train the model. |
+| Dataset | A structured collection of examples used for training or validation. |
+| Decoder-only transformer | A transformer architecture that predicts future tokens from past tokens. It is commonly used for text generation. |
+| Dropout | A training technique that randomly disables some values during training to reduce overfitting. |
+| Embedding | A learned numeric representation of a token or position. |
+| Epoch | One full pass through the training data. |
+| Feedforward layer | A neural network layer inside each transformer block that processes each token representation after attention. |
+| Generation | The process of producing new text from a prompt. |
+| Gradient | A value used during training that shows how a model parameter should change to reduce loss. |
+| Greedy sampling | A generation strategy that always chooses the highest-scoring next token. |
+| Hyperparameter | A setting chosen before training, such as learning rate, batch size, or number of layers. |
+| Inference | Running a trained model to make predictions or generate text. |
+| Layer normalization | A normalization step that helps keep training stable inside the transformer. |
+| Learning rate | A training setting that controls how large each optimizer update is. |
+| Logits | Raw model output scores before they are converted into probabilities. |
+| Loss | A number that measures how wrong the model prediction is. Lower loss usually means better predictions. |
+| Masked self-attention | Self-attention with a mask applied so tokens cannot use information from future positions. |
+| Model parameter | A learned value inside the model, such as a weight in a neural network layer. |
+| Multi-head self-attention | A form of attention that lets the model look at token relationships in multiple learned ways at the same time. |
+| Neural network | A model made of layers with learned parameters. It maps inputs to outputs through numeric operations. |
+| Optimizer | The training component that updates model parameters using gradients. |
+| Positional embedding | A learned representation that tells the model where each token appears in the sequence. |
+| Prompt | The starting text given to the model before generation begins. |
+| PyTorch | The machine learning library used by this project for tensors, neural network modules, gradients, and optimization. |
+| Residual connection | A connection that adds a layer's input back to its output. This helps information and gradients flow through deep models. |
+| Sampling | The process of choosing the next token from model output scores. |
+| Seed | A value used to make random behavior more repeatable. |
+| Self-attention | A mechanism that lets each token compare itself with other tokens in the same sequence. |
+| Sequence | An ordered list of tokens. |
+| Tensor | A multi-dimensional array of numbers used by PyTorch. Scalars, vectors, matrices, and batches can all be represented as tensors. |
+| Token | A numeric unit of text used by the model. In this project, tokens represent characters. |
+| Token ID | The integer assigned to a token by the tokenizer. |
+| Tokenizer | The component that converts text into token IDs and token IDs back into text. |
+| Top-k filtering | A sampling method that keeps only the highest-scoring `k` tokens before choosing the next token. |
+| Training | The process of updating model parameters so the model becomes better at predicting the next token. |
+| Training split | The part of the data used to update model parameters. |
+| Validation | The process of measuring model performance on data not used for parameter updates. |
+| Validation split | The part of the data used to check model performance during or after training. |
+| Vocabulary | The set of tokens the model knows how to process. |
+| Weight | A learned numeric parameter inside a neural network. |
+
+---
+
+## 13. Summary
 
 The architecture is intentionally modest.
 

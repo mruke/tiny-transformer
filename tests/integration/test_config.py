@@ -15,7 +15,7 @@ from tiny_transformer.config import AppConfig, ConfigError, load_config
 # That makes it easy to load the real config files from tests.
 # ---------------------------------------------------------------------------
 def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[1]
+    return Path(__file__).resolve().parents[2]
 
 
 # ---------------------------------------------------------------------------
@@ -40,7 +40,7 @@ def _valid_config_dict() -> dict:
     return {
         "project": {
             "name": "tiny-transformer",
-            "version": "0.1.0",
+            "version": "0.5.0",
             "seed": 42,
         },
         "data": {
@@ -115,7 +115,7 @@ def test_load_debug_config() -> None:
     config = load_config(config_path)
 
     assert isinstance(config, AppConfig)
-    assert config.project.version == "0.1.0-debug"
+    assert config.project.version == "0.5.0-debug"
     assert config.data.context_window == 32
     assert config.model.embedding_dim == 64
     assert config.model.num_layers == 1

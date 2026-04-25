@@ -27,7 +27,7 @@ def _build_test_config() -> AppConfig:
     return AppConfig(
         project=ProjectConfig(
             name="tiny-transformer",
-            version="0.1.0-test",
+            version="0.5.0-test",
             seed=42,
         ),
         data=DataConfig(

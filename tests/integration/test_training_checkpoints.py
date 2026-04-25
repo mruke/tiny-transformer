@@ -34,7 +34,7 @@ def _build_test_config() -> AppConfig:
     return AppConfig(
         project=ProjectConfig(
             name="tiny-transformer",
-            version="0.1.0-test",
+            version="0.5.0-test",
             seed=42,
         ),
         data=DataConfig(
@@ -213,7 +213,7 @@ def test_load_checkpoint_returns_saved_metadata(tmp_path: Path) -> None:
     assert isinstance(metadata, CheckpointMetadata)
     assert metadata.epoch == 2
     assert metadata.project_name == "tiny-transformer"
-    assert metadata.project_version == "0.1.0-test"
+    assert metadata.project_version == "0.5.0-test"
 
 
 # ---------------------------------------------------------------------------
@@ -301,4 +301,4 @@ def test_trainer_load_checkpoint_restores_saved_metadata(tmp_path: Path) -> None
     assert isinstance(loaded_metadata, CheckpointMetadata)
     assert loaded_metadata.epoch == 2
     assert loaded_metadata.project_name == "tiny-transformer"
-    assert loaded_metadata.project_version == "0.1.0-test"
+    assert loaded_metadata.project_version == "0.5.0-test"
