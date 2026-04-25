@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tiny-transformer"
-version = "0.1.0"
+version = "0.5.0"
 description = "A small decoder-only transformer built in PyTorch for character-level language modeling."
 readme = "README.md"
 requires-python = ">=3.11"

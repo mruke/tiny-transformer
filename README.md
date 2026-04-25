@@ -156,10 +156,10 @@ Additional project documentation includes:
 | Milestone 4 | Text generation | Done | — |
 | Milestone 4 | Sampling | Done | — |
 | Milestone 4 | Smoke tests | Done | — |
-| **Milestone 5** | **Overall** | **Pending** | — |
-| Milestone 5 | Documentation | Pending | — |
-| Milestone 5 | ADRs | Pending | — |
-| Milestone 5 | Cleanup and polish | Pending | — |
+| **Milestone 5** | **Overall** | **Complete** | **v0.5.0** |
+| Milestone 5 | Documentation | Done | — |
+| Milestone 5 | ADRs | Done | — |
+| Milestone 5 | Cleanup and polish | Done | — |
 
 ## Definition of Done for v1
 
@@ -184,4 +184,4 @@ Possible follow-up work after v1:
 
 ## Status
 
-Prototype complete. Final documentation and polish milestone in progress.
+Version 0.5.0 complete. The first portfolio-ready version is finished.
