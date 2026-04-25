@@ -197,6 +197,10 @@ Useful references include:
 
 ChatGPT was used during development as a learning, design, and review assistant. It helped with project planning, architecture discussion, documentation drafting, implementation review, and test-suite design. Some tests were generated with ChatGPT assistance and then reviewed, adapted, and validated as part of this repository.
 
+## License
+
+This project is licensed under the MIT License. See [`LICENSE`](LICENSE) for details.
+
 ## Status
 
 Version 0.5.0 complete. The first portfolio-ready version is finished.
