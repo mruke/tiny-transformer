@@ -15,7 +15,7 @@ from tiny_transformer.config import AppConfig, ConfigError, load_config
 # That makes it easy to load the real config files from tests.
 # ---------------------------------------------------------------------------
 def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[1]
+    return Path(__file__).resolve().parents[2]
 
 
 # ---------------------------------------------------------------------------
