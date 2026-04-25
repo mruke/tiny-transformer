@@ -15,7 +15,7 @@ The test suite is organized by test type.
 
 Most tests are unit or integration tests.
 
-The `e2e/` directory exists to reserve a clear place for full workflow tests. It may remain small or empty until the project has a true end-to-end test.
+The `e2e/` directory contains smoke-style tests for full project workflows. These tests should stay small and should verify that major pieces work together, not exhaustively retest every module.
 
 ## Running Tests
 
