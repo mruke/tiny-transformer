@@ -182,6 +182,23 @@ Possible follow-up work after v1:
 - richer evaluation
 - inference optimization experiments
 
+## References and Acknowledgements
+
+This project was built as a learning-focused implementation of a small decoder-only transformer for character-level language modeling.
+
+The implementation was informed by public educational and research resources on transformers, attention, neural networks, and PyTorch. These references were used for learning and conceptual grounding.
+
+Useful references include:
+
+- [Attention Is All You Need](https://arxiv.org/abs/1706.03762), the original transformer paper introducing the attention-based transformer architecture.
+- [The Annotated Transformer](https://nlp.seas.harvard.edu/annotated-transformer/), an educational PyTorch walkthrough of transformer building blocks.
+- [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/), a visual explanation of transformer concepts and attention.
+- [PyTorch Tutorials](https://docs.pytorch.org/tutorials/), official PyTorch learning materials for tensors, neural network modules, autograd, and training workflows.
+
+ChatGPT was used during development as a learning, design, and review assistant. It helped with project planning, architecture discussion, documentation drafting, implementation review, and test-suite design. Some tests were generated with ChatGPT assistance and then reviewed, adapted, and validated as part of this repository.
+
 ## Status
 
 Version 0.5.0 complete. The first portfolio-ready version is finished.
+
+
