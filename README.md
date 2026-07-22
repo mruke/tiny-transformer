@@ -1,53 +1,14 @@
-# Tiny Transformer From Scratch
+# Tiny Transformer
 
-A small PyTorch project for building a decoder-only transformer from scratch for character-level language modeling.
+A small PyTorch project that implements a decoder-only transformer for character-level language modeling, built from scratch to learn how transformer-based text generation actually works.
 
-The goal of this project is to learn how transformer-based text generation works by implementing the core parts step by step in a codebase that stays small, readable, and organized.
+This is a learning project, not a production system or a large-scale model. The design favors readable, modular, well-tested code over model scale or training performance. The goal is to make the mechanics of an autoregressive language model concrete by building each piece: tokenization, embeddings, masked self-attention, feedforward layers, residual connections and layer normalization, training and validation, checkpointing, generation, and sampling.
 
-This is not meant to be a large-scale model or a production-ready system. It is meant to be a practical learning project that makes the main ideas behind autoregressive language models easier to understand through implementation.
-
-## What This Project Is About
-
-Transformers are a type of neural network architecture used for sequence modeling, including modern language models. A decoder-only transformer learns to predict the next token in a sequence based on the tokens that came before it.
-
-In this project, the model works at the **character level**, meaning each character is treated as a token. That keeps the tokenizer and data pipeline simple, which makes it easier to focus on the core mechanics of the model itself.
-
-The project covers the main parts of a small language model, including:
-
-- tokenization
-- embeddings
-- masked self-attention
-- feedforward layers
-- residual connections and layer normalization
-- training and validation
-- checkpointing
-- autoregressive text generation
-- sampling strategies
-- basic testing
-
-## Purpose
-
-The purpose of this implementation is to better understand how a transformer language model works by building one from scratch.
-
-Rather than only using high-level libraries or pretrained models, this project is meant to make the individual pieces more concrete. Building a small model end to end helps connect the theory to actual code and makes the training and generation process easier to reason about.
-
-Keeping the project small is intentional. A character-level decoder-only model is limited enough to be manageable, but still includes the important ideas behind text generation with transformers.
-
-This project is also meant to practice writing ML code in a clean and maintainable way. Part of the goal is not just to make the model run, but to structure the repository so that the responsibilities of data handling, model code, training, and inference are separated clearly.
-
-## Goals
-
-The first version of this project is meant to:
-
-- implement a tiny decoder-only transformer from scratch
-- train on a small text corpus
-- generate text autoregressively from a prompt
-- keep the code modular and easy to follow
-- document major architecture and design decisions
+Character-level tokenization and a decoder-only architecture keep the scope small enough to implement and understand end to end, while still covering the core ideas behind modern text generation.
 
 ## Scope
 
-Implemented features for the initial version:
+Implemented in this version:
 
 - character-level tokenization
 - token and positional embeddings
@@ -56,40 +17,19 @@ Implemented features for the initial version:
 - residual connections and layer normalization
 - training loop with validation
 - checkpoint save/load
-- autoregressive text generation
-- greedy sampling
-- temperature sampling
-- top-k filtering
+- autoregressive text generation (greedy, temperature, top-k sampling)
 - configuration-driven hyperparameters
 - focused tests
 
-This first version is intentionally limited so the project stays understandable and realistic to complete.
+Out of scope for this version:
 
-## Non-Goals
-
-The initial version is not intended to include:
-
-- large-scale training
-- distributed training
+- large-scale or distributed training
 - mixed precision
-- advanced tokenizer implementations
+- advanced (subword) tokenization
 - production inference serving
 - optimization-heavy attention kernels
 
-These are possible future directions, but they are outside the scope of the first pass.
-
-## Why Build It This Way
-
-This project is built as a learning exercise, so the design choices are meant to reduce complexity where possible.
-
-A few examples:
-
-- **character-level tokenization** keeps preprocessing simple
-- **decoder-only architecture** keeps the modeling task focused on next-token prediction
-- **small repository structure** helps avoid one large script that becomes hard to maintain
-- **configuration-driven settings** make it easier to experiment without scattering constants through the code
-
-The project keeps the implementation small while still separating the major responsibilities of a transformer language modeling workflow.
+Possible follow-ups: KV-cache support, subword tokenizer support, benchmarking/profiling, richer evaluation, inference optimization experiments.
 
 ## Repository Structure
 
@@ -116,24 +56,7 @@ The project keeps the implementation small while still separating the major resp
     │       └── utils/
     └── tests/
 
-This layout separates configuration, data handling, model code, training, inference, scripts, and tests.
-
-## Architecture
-
-The codebase is organized around separate packages for configuration, data handling, model implementation, training, inference, scripts, and tests.
-
-For a more detailed architecture overview, including module responsibilities, runtime flows, diagrams, and design tradeoffs, see [`ARCHITECTURE.md`](ARCHITECTURE.md).
-
-## Engineering Principles
-
-The project favors readable, testable, modular code over clever abstractions or production-scale infrastructure.
-
-## Documentation
-
-Additional project documentation includes:
-
-- [`ARCHITECTURE.md`](ARCHITECTURE.md) for the technical structure, runtime flows, and design tradeoffs
-- `docs/adr/` for architecture decision records
+This layout separates configuration, data handling, model code, training, inference, scripts, and tests. See [`ARCHITECTURE.md`](ARCHITECTURE.md) for module responsibilities, runtime flows, diagrams, and design tradeoffs, and `docs/adr/` for individual design decisions.
 
 ## Milestones
 
@@ -163,43 +86,27 @@ Additional project documentation includes:
 
 ## Definition of Done for v1
 
-The first version will be considered complete when it can:
-
-- train end to end on a small text dataset
-- generate text from a saved checkpoint
-- run with a clean and understandable structure
-- expose key hyperparameters through configuration
-- pass a basic test suite
-- include architecture and design documentation
-
-## Future Extensions
-
-Possible follow-up work after v1:
-
-- KV-cache support
-- subword tokenizer support
-- benchmarking and profiling
-- richer evaluation
-- inference optimization experiments
+- trains end to end on a small text dataset
+- generates text from a saved checkpoint
+- runs with a clean, understandable structure
+- exposes key hyperparameters through configuration
+- passes a basic test suite
+- includes architecture and design documentation
 
 ## References and Acknowledgements
 
-This project was built as a learning-focused implementation of a small decoder-only transformer for character-level language modeling.
+Built as a learning-focused implementation of a small decoder-only transformer, informed by:
 
-The implementation was informed by public educational and research resources on transformers, attention, neural networks, and PyTorch. These references were used for learning and conceptual grounding.
+- [Attention Is All You Need](https://arxiv.org/abs/1706.03762), the original transformer paper.
+- [The Annotated Transformer](https://nlp.seas.harvard.edu/annotated-transformer/), an educational PyTorch walkthrough.
+- [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/), a visual explanation of attention.
+- [PyTorch Tutorials](https://docs.pytorch.org/tutorials/), official PyTorch learning materials.
 
-Useful references include:
-
-- [Attention Is All You Need](https://arxiv.org/abs/1706.03762), the original transformer paper introducing the attention-based transformer architecture.
-- [The Annotated Transformer](https://nlp.seas.harvard.edu/annotated-transformer/), an educational PyTorch walkthrough of transformer building blocks.
-- [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/), a visual explanation of transformer concepts and attention.
-- [PyTorch Tutorials](https://docs.pytorch.org/tutorials/), official PyTorch learning materials for tensors, neural network modules, autograd, and training workflows.
-
-ChatGPT was used during development as a learning, design, and review assistant. It helped with project planning, architecture discussion, documentation drafting, implementation review, and test-suite design. Some tests were generated with ChatGPT assistance and then reviewed, adapted, and validated as part of this repository.
+ChatGPT was used during development as a learning, design, and review assistant for project planning, architecture discussion, documentation drafting, implementation review, and test-suite design. Some tests were generated with ChatGPT assistance and then reviewed, adapted, and validated as part of this repository.
 
 ## License
 
-This project is licensed under the MIT License. See [`LICENSE`](LICENSE) for details.
+MIT. See [`LICENSE`](LICENSE).
 
 ## Status
 
