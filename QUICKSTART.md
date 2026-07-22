@@ -1,6 +1,6 @@
 # Quickstart
 
-This guide walks through running **Tiny Transformer** on your own machine: installing it, training it on a small text file, and generating text from it.
+This guide walks through running **tiny-transformer** on your own machine: installing it, training it on a small text file, and generating text from it.
 
 ## Prerequisites
 
@@ -59,8 +59,6 @@ Configs live in `configs/` and control model size, training settings, and more.
 - `configs/debug.yaml` is smaller and trains much faster, good for a first run or a smoke test.
 
 Start with the debug config.
-
-## 5. Train the model
 
 ## 5. Train the model
 

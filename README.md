@@ -1,4 +1,4 @@
-# Tiny Transformer
+# tiny-transformer
 
 A small PyTorch project that implements a decoder-only transformer for character-level language modeling, built from scratch to learn how transformer-based text generation actually works.
 

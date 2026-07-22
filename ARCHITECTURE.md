@@ -1,6 +1,6 @@
 # Architecture
 
-This document gives a architecture overview for **Tiny-Transformer**, loosely following the arc42 style, scoped to relevance for a small local machine learning project.
+This document gives a architecture overview for **tiny-transformer**, loosely following the arc42 style, scoped to relevance for a small local machine learning project.
 
 For project purpose and scope, see [`README.md`](README.md). For individual design decisions and their tradeoffs, see [`docs/adr/`](docs/adr/).
 
@@ -45,7 +45,7 @@ Training and generation share the same core model and tokenizer concepts, but ar
 A developer or reviewer interacts with the system through the CLI scripts, which read configuration and input text from the local filesystem, run PyTorch code, and write checkpoints or generated text output. There is no other runtime environment to consider.
 
     +----------------------------------------------------------------------------------+
-    | Tiny Transformer From Scratch                                                    |
+    | tiny-transformer                                                    |
     |----------------------------------------------------------------------------------|
     | Purpose: train and run a small decoder-only transformer for character-level LM    |
     +----------------------------------------------------------------------------------+
@@ -63,7 +63,7 @@ A developer or reviewer interacts with the system through the CLI scripts, which
                 |
                 v
     +----------------------------------------------------------------------------------+
-    | Tiny Transformer Python Application                                              |
+    | tiny-transformer Python Application                                              |
     |----------------------------------------------------------------------------------|
     | config      - configuration loading and validation                               |
     | data        - tokenizer, train/validation split, sequence dataset                |
