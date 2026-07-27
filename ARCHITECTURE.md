@@ -44,54 +44,50 @@ Training and generation share the same core model and tokenizer concepts, but ar
 
 A developer or reviewer interacts with the system through the CLI scripts, which read configuration and input text from the local filesystem, run PyTorch code, and write checkpoints or generated text output. There is no other runtime environment to consider.
 
-    +----------------------------------------------------------------------------------+
-    | tiny-transformer                                                    |
-    |----------------------------------------------------------------------------------|
-    | Purpose: train and run a small decoder-only transformer for character-level LM    |
-    +----------------------------------------------------------------------------------+
+```mermaid
+flowchart TD
+    User["Developer / User"]
 
-        [Developer / User]
-                |
-                v
-    +-------------------------+        reads/writes        +--------------------------+
-    | CLI Scripts             | <------------------------> | Local Filesystem         |
-    |-------------------------|                            |--------------------------|
-    | scripts/train.py        |                            | configs/*.yaml           |
-    | scripts/generate.py     |                            | data/input.txt           |
-    |                         |                            | outputs/checkpoints/*.pt |
-    +-------------------------+                            +--------------------------+
-                |
-                v
-    +----------------------------------------------------------------------------------+
-    | tiny-transformer Python Application                                              |
-    |----------------------------------------------------------------------------------|
-    | config      - configuration loading and validation                               |
-    | data        - tokenizer, train/validation split, sequence dataset                |
-    | model       - embeddings, attention, feedforward layers, transformer blocks      |
-    | training    - losses, optimizer, metrics, trainer, checkpoints                  |
-    | inference   - generation loop, generator, sampling strategies                   |
-    +----------------------------------------------------------------------------------+
-                |
-                v
-    +-------------------------+
-    | PyTorch Runtime         |
-    |-------------------------|
-    | tensors                 |
-    | autograd                |
-    | neural network modules  |
-    | optimization            |
-    +-------------------------+
+    subgraph CLI["CLI Scripts"]
+        Train["scripts/train.py"]
+        Generate["scripts/generate.py"]
+    end
 
-    Entry points:
+    subgraph FS["Local Filesystem"]
+        Configs["configs/*.yaml"]
+        Input["data/input.txt"]
+        Checkpoints["outputs/checkpoints/*.pt"]
+    end
 
-    scripts/train.py
-        -> config -> data -> model -> training -> checkpoint output
+    subgraph App["tiny-transformer Python Application"]
+        Config["config — loading and validation"]
+        Data["data — tokenizer, splits, dataset"]
+        Model["model — embeddings, attention,<br/>feedforward, transformer blocks"]
+        Training["training — losses, optimizer,<br/>metrics, trainer, checkpoints"]
+        Inference["inference — generation loop,<br/>generator, sampling"]
+    end
 
-    scripts/generate.py
-        -> config -> data/tokenizer reconstruction -> model
-        -> checkpoint loading -> inference -> generated text output
+    subgraph PT["PyTorch Runtime"]
+        Tensors["tensors"]
+        Autograd["autograd"]
+        NN["neural network modules"]
+        Opt["optimization"]
+    end
 
----
+    User --> CLI
+    CLI <--> FS
+    CLI --> App
+    App --> PT
+
+    Train -.-> Config
+    Train -.-> Data
+    Train -.-> Model
+    Train -.-> Training
+    Generate -.-> Config
+    Generate -.-> Data
+    Generate -.-> Model
+    Generate -.-> Inference
+```
 
 ## 4. Runtime View
 
